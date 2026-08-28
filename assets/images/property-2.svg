@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e8e2f8"/><stop offset="1" stop-color="#bac8de"/></linearGradient></defs>
+  <rect width="800" height="520" fill="url(#bg)"/><rect y="340" width="800" height="180" fill="#526b85"/>
+  <rect x="110" y="125" width="500" height="235" rx="8" fill="#eee9df"/><rect x="146" y="167" width="88" height="96" fill="#82b7c5"/><rect x="262" y="167" width="88" height="96" fill="#82b7c5"/><rect x="378" y="167" width="88" height="96" fill="#82b7c5"/><rect x="494" y="167" width="78" height="96" fill="#82b7c5"/>
+  <rect x="85" y="105" width="550" height="25" fill="#3e4e6b"/><path d="M95 105 360 42l265 63z" fill="#687b99"/><rect x="316" y="278" width="92" height="82" fill="#8b654c"/><path d="M316 278h92l-46-42z" fill="#694735"/>
+  <text x="32" y="48" font-family="Arial" font-size="24" font-weight="700" fill="#283858">DEMO HOME 02</text>
+</svg>

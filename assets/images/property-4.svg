@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+  <defs><linearGradient id="water" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d7f4ef"/><stop offset="1" stop-color="#82b5c2"/></linearGradient></defs>
+  <rect width="800" height="520" fill="url(#water)"/><rect y="360" width="800" height="160" fill="#32586a"/><rect x="130" y="95" width="530" height="270" fill="#f3f4ee"/><rect x="170" y="130" width="450" height="28" fill="#e2ad67"/>
+  <g fill="#6aafba"><rect x="170" y="190" width="88" height="105"/><rect x="286" y="190" width="88" height="105"/><rect x="402" y="190" width="88" height="105"/><rect x="518" y="190" width="88" height="105"/></g>
+  <path d="M104 365h610" stroke="#e2ad67" stroke-width="10"/><circle cx="690" cy="125" r="40" fill="#f6dd9b"/>
+  <text x="32" y="48" font-family="Arial" font-size="24" font-weight="700" fill="#234451">DEMO HOME 04</text>
+</svg>

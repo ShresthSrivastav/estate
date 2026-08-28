@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+  <defs><linearGradient id="night" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#172f51"/><stop offset="1" stop-color="#537d92"/></linearGradient></defs>
+  <rect width="800" height="520" fill="url(#night)"/><circle cx="650" cy="105" r="45" fill="#f8edbd"/><rect y="360" width="800" height="160" fill="#273b4e"/>
+  <rect x="140" y="125" width="500" height="235" fill="#d8d1c4"/><path d="M105 130 390 45l290 85z" fill="#283c57"/><g fill="#eec86f"><rect x="180" y="175" width="85" height="82"/><rect x="290" y="175" width="85" height="82"/><rect x="400" y="175" width="85" height="82"/><rect x="510" y="175" width="85" height="82"/></g><rect x="337" y="282" width="106" height="78" fill="#6b4936"/>
+  <text x="32" y="48" font-family="Arial" font-size="24" font-weight="700" fill="#eaf5fa">DEMO HOME 05</text>
+</svg>

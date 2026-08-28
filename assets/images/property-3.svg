@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+  <defs><linearGradient id="sun" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe6ad"/><stop offset="1" stop-color="#ee9c82"/></linearGradient></defs>
+  <rect width="800" height="520" fill="url(#sun)"/><circle cx="110" cy="110" r="55" fill="#fff6d3"/><rect y="370" width="800" height="150" fill="#3c6857"/>
+  <path d="M180 372V180h410v192z" fill="#f9f0d6"/><path d="M145 190 385 80l240 110z" fill="#6a4d4b"/><rect x="220" y="225" width="105" height="110" fill="#8bc3c4"/><rect x="395" y="225" width="105" height="110" fill="#8bc3c4"/><rect x="344" y="278" width="76" height="94" fill="#79533c"/>
+  <path d="M68 375c12-85 38-84 52 0M650 375c12-102 40-101 55 0" stroke="#244b43" stroke-width="18" fill="none"/>
+  <text x="32" y="48" font-family="Arial" font-size="24" font-weight="700" fill="#543e45">DEMO HOME 03</text>
+</svg>
