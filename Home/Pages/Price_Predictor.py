@@ -16,6 +16,8 @@ st.set_page_config(page_title="Price Predictor | Nestwise", page_icon="💰", la
 
 @st.cache_resource(show_spinner=False)
 def load_pipeline():
+    if PREDICTOR_PIPELINE.stat().st_size < 1024:
+        raise RuntimeError("The model is a Git-LFS pointer. Pull Git-LFS assets before deploying.")
     with PREDICTOR_PIPELINE.open("rb") as file:
         return pickle.load(file)
 
@@ -34,8 +36,16 @@ try:
 except AttributeError:
     st.error("The saved model needs scikit-learn 1.6.1. Install the pinned requirements and restart the app.")
     st.stop()
+except RuntimeError as error:
+    st.error(str(error))
+    st.info("Run `git lfs install` and `git lfs pull` locally, then push the Git-LFS object to GitHub.")
+    st.stop()
 except (FileNotFoundError, ModuleNotFoundError) as error:
     st.error(f"Price prediction assets could not be loaded: {error}")
+    st.stop()
+except (EOFError, ValueError, pickle.UnpicklingError) as error:
+    st.error(f"The saved model could not be read: {error}")
+    st.info("Confirm that the Git-LFS model was downloaded and committed through Git LFS.")
     st.stop()
 
 

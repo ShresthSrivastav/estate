@@ -9,3 +9,4 @@ venv/
 Home/con.py
 feature_text.pkl
 *.log
+outputs/
