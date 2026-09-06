@@ -7,6 +7,7 @@ The remaining fields are optional preferences used only to rank eligible rows.
 from __future__ import annotations
 
 import re
+from math import asin, cos, radians, sin, sqrt
 from typing import Any
 
 import pandas as pd
@@ -41,6 +42,23 @@ def _number(value: Any) -> float | None:
 
 def _same(value: Any, target: Any) -> bool:
     return _text(value) == _text(target)
+
+
+def _distance_km(first: tuple[float, float], second: tuple[float, float]) -> float:
+    """Return the great-circle distance between two latitude/longitude pairs."""
+    lat1, lon1 = map(radians, first)
+    lat2, lon2 = map(radians, second)
+    value = sin((lat2 - lat1) / 2) ** 2 + cos(lat1) * cos(lat2) * sin((lon2 - lon1) / 2) ** 2
+    return 6371 * 2 * asin(sqrt(value))
+
+
+def _sector_coordinates(coordinates: pd.DataFrame | None) -> dict[str, tuple[float, float]]:
+    if coordinates is None or coordinates.empty:
+        return {}
+    return {
+        _text(row.sector): (float(row.latitude), float(row.longitude))
+        for row in coordinates.itertuples(index=False)
+    }
 
 
 def sector_options(df: pd.DataFrame) -> list[str]:
@@ -107,6 +125,8 @@ def recommend_properties(
     preferences: dict[str, Any] | None = None,
     limit: int = 10,
     sort_by: str = "Best Match",
+    location_radius_km: float = 0,
+    coordinates: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Filter hard constraints, then rank candidates using active preferences."""
     preferences = {k: v for k, v in (preferences or {}).items() if v not in (None, "Any", "")}
@@ -114,10 +134,23 @@ def recommend_properties(
     work["_price"] = pd.to_numeric(work["price"], errors="coerce")
 
     # Hard constraints. No relaxed row can enter the exact result set.
-    candidates = work[
-        work["sector"].map(_text).eq(_text(sector))
-        & work["_price"].le(float(max_budget))
-    ].copy()
+    sector_map = _sector_coordinates(coordinates)
+    target_point = sector_map.get(_text(sector))
+    work["distance_km"] = work["sector"].map(
+        lambda value: 0.0 if _text(value) == _text(sector) else float("nan")
+    )
+    if target_point and location_radius_km > 0:
+        work["distance_km"] = work["sector"].map(
+            lambda value: (
+                _distance_km(target_point, sector_map[_text(value)])
+                if _text(value) in sector_map
+                else float("nan")
+            )
+        )
+        location_filter = work["distance_km"].le(float(location_radius_km))
+    else:
+        location_filter = work["sector"].map(_text).eq(_text(sector))
+    candidates = work[location_filter & work["_price"].le(float(max_budget))].copy()
     if candidates.empty:
         return candidates.assign(match_score=pd.Series(dtype=float))
 
@@ -128,8 +161,13 @@ def recommend_properties(
     rows = []
     for index, row in candidates.iterrows():
         budget_utilization = min(max(row["_price"] / float(max_budget), 0), 1)
-        points = {"location": 25.0, "budget": 20.0 * budget_utilization}
-        reasons = ["Within maximum budget", "Preferred location matched"]
+        location_score = 1.0
+        location_reason = "Preferred location matched"
+        if location_radius_km > 0 and target_point and pd.notna(row["distance_km"]):
+            location_score = max(0.0, 1 - float(row["distance_km"]) / float(location_radius_km))
+            location_reason = f"Within {float(row['distance_km']):.1f} km of the preferred sector"
+        points = {"location": 25.0 * location_score, "budget": 20.0 * budget_utilization}
+        reasons = ["Within maximum budget", location_reason]
         tradeoffs: list[str] = []
         for name, target in preferences.items():
             if name not in PREFERENCE_WEIGHTS:
@@ -161,18 +199,29 @@ def recommend_properties(
         ranked = ranked.assign(_bedrooms=ranked["bedRoom"].map(_number)).sort_values(["_bedrooms", "match_score"], ascending=[False, False])
     elif sort_by == "Best Budget Fit":
         ranked = ranked.assign(_budget_gap=(float(max_budget) - ranked["_price"]).abs()).sort_values(["_budget_gap", "match_score"], ascending=[True, False])
+    elif sort_by == "Closest Location":
+        ranked = ranked.sort_values(["distance_km", "match_score"], ascending=[True, False], na_position="last")
     else:
         ranked = ranked.sort_values(["match_score", "_price"], ascending=[False, True])
     return ranked.head(limit).reset_index(drop=True)
 
 
-def alternative_properties(df: pd.DataFrame, sector: str, max_budget: float, limit: int = 3) -> dict[str, pd.DataFrame]:
+def alternative_properties(
+    df: pd.DataFrame,
+    sector: str,
+    max_budget: float,
+    limit: int = 3,
+    budget_tolerance: float = 0,
+) -> dict[str, pd.DataFrame]:
     """Return explicitly relaxed suggestions for the no-exact-match state."""
     work = df.copy()
     work["_price"] = pd.to_numeric(work["price"], errors="coerce")
     same_sector = work[work["sector"].map(_text).eq(_text(sector))]
+    over_budget = same_sector[same_sector["_price"] > max_budget]
+    if budget_tolerance > 0:
+        over_budget = over_budget[over_budget["_price"] <= max_budget * (1 + budget_tolerance / 100)]
     return {
-        "same_sector_over_budget": same_sector[same_sector["_price"] > max_budget].sort_values("_price").head(limit),
+        "same_sector_over_budget": over_budget.sort_values("_price").head(limit),
         "other_sector_within_budget": work[
             ~work["sector"].map(_text).eq(_text(sector)) & work["_price"].le(max_budget)
         ].sort_values("_price").head(limit),

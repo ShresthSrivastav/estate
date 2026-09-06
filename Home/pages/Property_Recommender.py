@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from utils.data_loader import ASSET_DIR, load_recommender_data
+from utils.data_loader import ASSET_DIR, load_recommender_data, load_sector_coordinates
 from utils.recommender import (
     FURNISHING_LABELS,
     alternative_properties,
@@ -38,7 +38,14 @@ def load_data():
     return load_recommender_data()
 
 
+@st.cache_data(show_spinner=False)
+def load_coordinates():
+    return load_sector_coordinates()
+
+
 df = load_data()
+sector_coordinates = load_coordinates()
+st.session_state.setdefault("favorites", set())
 st.markdown(
     """
     <section class="reco-hero">
@@ -58,6 +65,7 @@ with st.form("property_search"):
     with hard_left:
         selected_sector = st.selectbox("Location / sector", sector_options(df), format_func=lambda value: value.title())
     with hard_right:
+        location_radius = st.slider("Nearby-sector radius (km)", 0, 20, 0, help="0 keeps the search in the selected sector. A larger value includes sectors with coordinates within this radius.")
         max_budget = st.number_input("Maximum budget (₹ Cr)", min_value=0.05, max_value=100.0, value=1.50, step=0.05, format="%.2f")
 
     st.subheader("Optional preferences")
@@ -75,8 +83,9 @@ with st.form("property_search"):
     with third:
         servant_room = st.checkbox("Servant room")
         store_room = st.checkbox("Store room")
-        sort_by = st.selectbox("Sort results by", ["Best Match", "Lowest Price", "Largest Area", "Most Bedrooms", "Best Budget Fit"])
+        sort_by = st.selectbox("Sort results by", ["Best Match", "Lowest Price", "Largest Area", "Most Bedrooms", "Best Budget Fit", "Closest Location"])
         result_limit = st.select_slider("Recommendations", options=[5, 10], value=5)
+        budget_tolerance = st.slider("Fallback budget flexibility (%)", 0, 20, 10, help="Used only when no exact matches exist. Exact results never exceed your maximum budget.")
     submitted = st.form_submit_button("Find my property", type="primary", width="stretch")
 
 if submitted:
@@ -93,17 +102,17 @@ if submitted:
         "servant_room": 1 if servant_room else None,
         "store_room": 1 if store_room else None,
     }
-    st.session_state["search"] = {"sector": selected_sector, "budget": max_budget, "preferences": preferences, "sort_by": sort_by, "limit": result_limit}
+    st.session_state["search"] = {"sector": selected_sector, "budget": max_budget, "preferences": preferences, "sort_by": sort_by, "limit": result_limit, "budget_tolerance": budget_tolerance, "location_radius": location_radius}
 
 search = st.session_state.get("search")
 if search:
-    results = recommend_properties(df, search["sector"], search["budget"], search["preferences"], search["limit"], search["sort_by"])
+    results = recommend_properties(df, search["sector"], search["budget"], search["preferences"], search["limit"], search["sort_by"], location_radius_km=search.get("location_radius", 0), coordinates=sector_coordinates)
     st.divider()
     if results.empty:
         st.subheader("No exact matches")
         st.warning(f"No properties found in {search['sector'].title()} within your maximum budget of {format_price(search['budget'])}.")
         st.caption("The recommendations below are explicitly relaxed alternatives. They do not satisfy the original location-and-budget constraints.")
-        alternatives = alternative_properties(df, search["sector"], search["budget"])
+        alternatives = alternative_properties(df, search["sector"], search["budget"], budget_tolerance=search.get("budget_tolerance", 0))
         same_sector = alternatives["same_sector_over_budget"]
         other_sector = alternatives["other_sector_within_budget"]
         if not same_sector.empty:
@@ -115,8 +124,9 @@ if search:
         if same_sector.empty and other_sector.empty:
             st.info("There are no relaxed alternatives in the current dataset for this budget.")
     else:
-        st.subheader(f"Recommended properties · {len(results)} exact matches")
-        st.caption(f"All results satisfy {search['sector'].title()} and price ≤ {format_price(search['budget'])}. Ranked by {search['sort_by'].lower()}.")
+        st.subheader(f"Recommended properties · {len(results)} matches")
+        location_label = search['sector'].title() if not search.get("location_radius") else f"within {search['location_radius']} km of {search['sector'].title()}"
+        st.caption(f"All results satisfy {location_label} and price ≤ {format_price(search['budget'])}. Ranked by {search['sort_by'].lower()}.")
         for _, row in results.iterrows():
             image_number = int(row["_index"]) % 6 + 1
             with st.container(border=True):
@@ -131,6 +141,13 @@ if search:
                     st.progress(min(float(row["match_score"]) / 100, 1), text=f"{row['match_score']:.1f}% match")
                 with action_col:
                     st.metric("Budget used", f"{row['budget_utilization']:.0f}%")
+                    favorite = row["_index"] in st.session_state["favorites"]
+                    if st.button("Saved" if favorite else "Save", key=f"save-{row['_index']}", width="stretch"):
+                        if favorite:
+                            st.session_state["favorites"].remove(row["_index"])
+                        else:
+                            st.session_state["favorites"].add(row["_index"])
+                        st.rerun()
                     if st.button("View property", key=f"view-{row['_index']}", width="stretch"):
                         st.session_state["selected_property"] = row.to_dict()
                         st.rerun()
@@ -139,6 +156,9 @@ if search:
         st.markdown("#### Compare these matches")
         comparison = results[["property_type", "sector", "price", "bedRoom", "bathroom", "built_up_area", "match_score"]].rename(columns={"price": "price_cr", "bedRoom": "bedrooms", "match_score": "match_%"})
         st.dataframe(comparison, hide_index=True, width="stretch")
+        saved_count = sum(row["_index"] in st.session_state["favorites"] for _, row in results.iterrows())
+        if saved_count:
+            st.caption(f"{saved_count} result{'s' if saved_count != 1 else ''} saved for this session.")
 
 selected = st.session_state.get("selected_property")
 if selected:

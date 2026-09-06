@@ -33,8 +33,10 @@ The score is intentionally transparent: location and budget are always active, w
 - Modern Home landing page
 - Original ML Price Predictor, loaded from `model selection/pipeline.pkl`
 - Property Recommender with exact sector and budget constraints
-- Best Match, Lowest Price, Largest Area, Most Bedrooms, and Best Budget Fit sorting
+- Best Match, Lowest Price, Largest Area, Most Bedrooms, Best Budget Fit, and Closest Location sorting
 - Match percentages, budget utilization, score breakdown, comparisons, and property details
+- Nearby-sector matching using the dataset's sector coordinates
+- Session-only saved properties and explicitly labeled fallback budget flexibility
 - Local illustrative demo images in `assets/images/`
 - Clearly labelled demo location-search links instead of invented listing URLs
 - Existing Analytics page with map, word cloud, area/price, BHK, price distribution, and summary views
@@ -86,4 +88,4 @@ The dataset is a historical/demo dataset and recommendation scores indicate feat
 
 ## Future improvements
 
-Future versions could add live listing ingestion, geospatial nearby-sector constraints, user accounts, saved searches, and a model registry for safer pipeline versioning.
+Future versions could add live listing ingestion, user accounts, persistent saved searches, and a model registry for safer pipeline versioning.
