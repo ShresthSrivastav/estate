@@ -77,7 +77,7 @@ with st.form("property_search"):
         store_room = st.checkbox("Store room")
         sort_by = st.selectbox("Sort results by", ["Best Match", "Lowest Price", "Largest Area", "Most Bedrooms", "Best Budget Fit"])
         result_limit = st.select_slider("Recommendations", options=[5, 10], value=5)
-    submitted = st.form_submit_button("Find my property", type="primary", use_container_width=True)
+    submitted = st.form_submit_button("Find my property", type="primary", width="stretch")
 
 if submitted:
     st.session_state.pop("selected_property", None)
@@ -108,10 +108,10 @@ if search:
         other_sector = alternatives["other_sector_within_budget"]
         if not same_sector.empty:
             st.markdown("#### Same sector · over budget")
-            st.dataframe(same_sector[["sector", "property_type", "price", "bedRoom", "bathroom", "built_up_area"]].rename(columns={"price": "price_cr", "bedRoom": "bedrooms"}), hide_index=True, use_container_width=True)
+            st.dataframe(same_sector[["sector", "property_type", "price", "bedRoom", "bathroom", "built_up_area"]].rename(columns={"price": "price_cr", "bedRoom": "bedrooms"}), hide_index=True, width="stretch")
         if not other_sector.empty:
             st.markdown("#### Other sectors · within budget")
-            st.dataframe(other_sector[["sector", "property_type", "price", "bedRoom", "bathroom", "built_up_area"]].rename(columns={"price": "price_cr", "bedRoom": "bedrooms"}), hide_index=True, use_container_width=True)
+            st.dataframe(other_sector[["sector", "property_type", "price", "bedRoom", "bathroom", "built_up_area"]].rename(columns={"price": "price_cr", "bedRoom": "bedrooms"}), hide_index=True, width="stretch")
         if same_sector.empty and other_sector.empty:
             st.info("There are no relaxed alternatives in the current dataset for this budget.")
     else:
@@ -122,7 +122,7 @@ if search:
             with st.container(border=True):
                 image_col, detail_col, action_col = st.columns([1, 1.65, .7])
                 with image_col:
-                    st.image(ASSET_DIR / f"property-{image_number}.svg", use_container_width=True)
+                    st.image(str(ASSET_DIR / f"property-{image_number}.svg"))
                     st.caption("Illustrative demo image")
                 with detail_col:
                     st.markdown(f"### {format_price(float(row['price']))}")
@@ -131,14 +131,14 @@ if search:
                     st.progress(min(float(row["match_score"]) / 100, 1), text=f"{row['match_score']:.1f}% match")
                 with action_col:
                     st.metric("Budget used", f"{row['budget_utilization']:.0f}%")
-                    if st.button("View property", key=f"view-{row['_index']}", use_container_width=True):
+                    if st.button("View property", key=f"view-{row['_index']}", width="stretch"):
                         st.session_state["selected_property"] = row.to_dict()
                         st.rerun()
                     st.caption("Demo detail view")
 
         st.markdown("#### Compare these matches")
         comparison = results[["property_type", "sector", "price", "bedRoom", "bathroom", "built_up_area", "match_score"]].rename(columns={"price": "price_cr", "bedRoom": "bedrooms", "match_score": "match_%"})
-        st.dataframe(comparison, hide_index=True, use_container_width=True)
+        st.dataframe(comparison, hide_index=True, width="stretch")
 
 selected = st.session_state.get("selected_property")
 if selected:
@@ -146,14 +146,14 @@ if selected:
     st.subheader("Property detail")
     detail_col, score_col = st.columns([1.2, 1])
     with detail_col:
-        st.image(ASSET_DIR / f"property-{int(selected['_index']) % 6 + 1}.svg", use_container_width=True)
+        st.image(str(ASSET_DIR / f"property-{int(selected['_index']) % 6 + 1}.svg"))
         st.caption("Illustrative local demo image · this is not a photograph of the exact dataset record")
     with score_col:
         st.markdown(f"### {format_price(float(selected['price']))}")
         st.markdown(f"**{str(selected['bedRoom']).replace('.0', '')} BHK {str(selected['property_type']).title()}** · {str(selected['sector']).title()}")
         st.progress(min(float(selected["match_score"]) / 100, 1), text=f"{selected['match_score']:.1f}% recommendation match")
         st.write(f"Budget utilization: **{selected['budget_utilization']:.1f}%**")
-        st.link_button("Open demo location search", f"https://www.google.com/maps/search/{quote_plus(str(selected['sector']) + ' Gurgaon')}", use_container_width=True)
+        st.link_button("Open demo location search", f"https://www.google.com/maps/search/{quote_plus(str(selected['sector']) + ' Gurgaon')}", width="stretch")
 
     details = {
         "Price": format_price(float(selected["price"])),
@@ -171,7 +171,7 @@ if selected:
         "Servant room": "Yes" if float(selected["servant room"]) else "No",
         "Store room": "Yes" if float(selected["store room"]) else "No",
     }
-    st.dataframe(pd.DataFrame(details.items(), columns=["Attribute", "Value"]), hide_index=True, use_container_width=True)
+    st.dataframe(pd.DataFrame(details.items(), columns=["Attribute", "Value"]), hide_index=True, width="stretch")
     st.markdown("#### Why this property was recommended")
     for reason in selected["match_reasons"]:
         st.markdown(f"✓ {reason}")

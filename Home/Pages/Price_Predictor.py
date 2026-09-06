@@ -72,7 +72,7 @@ with st.form("price_prediction"):
         store_room = float(st.selectbox("Store room", [0.0, 1.0]))
         luxury_category = st.selectbox("Luxury category", options("luxury_category"))
         floor_category = st.selectbox("Floor category", options("floor_category"))
-    submitted = st.form_submit_button("Estimate price", type="primary", use_container_width=True)
+    submitted = st.form_submit_button("Estimate price", type="primary", width="stretch")
 
 if submitted:
     columns = [
