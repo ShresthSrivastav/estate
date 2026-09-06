@@ -46,7 +46,7 @@ The score is intentionally transparent: location and budget are always active, w
 ```text
 Home/
   Home.py
-  Pages/
+  pages/
     Price_Predictor.py
     Property_Recommender.py
     Analysis_App.py

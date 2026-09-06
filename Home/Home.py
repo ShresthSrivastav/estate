@@ -40,13 +40,13 @@ left, right = st.columns([1.2, 1])
 with left:
     st.subheader("Start with your brief")
     st.write("Set a hard location and maximum budget, then let preference matching bring the most relevant options to the top.")
-    st.page_link("Pages/Property_Recommender.py", label="Find my property →", icon="🏠")
+    st.page_link("pages/Property_Recommender.py", label="Find my property →", icon="🏠")
 with right:
     st.info("**Demo dataset**\n\nProperty cards use local illustrative images. Prices and attributes come from the project's real cleaned dataset; they are not active listings.")
 
 st.write("### Explore the project")
 a, b = st.columns(2)
 with a:
-    st.page_link("Pages/Price_Predictor.py", label="Estimate a property's price", icon="💰")
+    st.page_link("pages/Price_Predictor.py", label="Estimate a property's price", icon="💰")
 with b:
-    st.page_link("Pages/Analysis_App.py", label="View market analytics", icon="📊")
+    st.page_link("pages/Analysis_App.py", label="View market analytics", icon="📊")
