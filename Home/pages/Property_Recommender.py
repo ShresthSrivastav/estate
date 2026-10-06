@@ -35,6 +35,13 @@ st.markdown(
         background: #d5f3e8; color: #12614d; font-size: .78rem; font-weight: 700;
         letter-spacing: .04em; margin-bottom: .45rem;
     }
+    @media (max-width: 640px) {
+        div[data-testid="stHorizontalBlock"] { flex-wrap: wrap; }
+        div[data-testid="column"] {
+            flex: 1 1 100% !important; width: 100% !important;
+            min-width: 100% !important;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
