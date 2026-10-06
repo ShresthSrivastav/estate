@@ -21,14 +21,14 @@ st.markdown(
     <section class="hero">
       <div class="eyebrow">NESTWISE · GURGAON PROPERTY DISCOVERY</div>
       <h1>Find a home that fits<br>the way you live.</h1>
-      <p>Explore data-backed property prices and get transparent recommendations that respect your location and budget first.</p>
+      <p>Explore the cleaned Gurgaon property dataset and get transparent recommendations that respect your location and budget first.</p>
     </section>
     """,
     unsafe_allow_html=True,
 )
 
 st.write("### A smarter way to explore real estate")
-st.write("Nestwise combines the original price prediction model with an explainable recommendation workflow built on the project's cleaned property data.")
+st.write("Nestwise combines market analytics with an explainable recommendation workflow built on the project's cleaned property data.")
 
 first, second, third = st.columns(3)
 first.metric("3,554", "cleaned property records")
@@ -45,8 +45,4 @@ with right:
     st.info("**Demo dataset**\n\nProperty cards use local illustrative images. Prices and attributes come from the project's real cleaned dataset; they are not active listings.")
 
 st.write("### Explore the project")
-a, b = st.columns(2)
-with a:
-    st.page_link("pages/Price_Predictor.py", label="Estimate a property's price", icon="💰")
-with b:
-    st.page_link("pages/Analysis_App.py", label="View market analytics", icon="📊")
+st.page_link("pages/Analysis_App.py", label="View market analytics", icon="📊")

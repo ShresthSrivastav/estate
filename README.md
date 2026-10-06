@@ -31,7 +31,7 @@ The score is intentionally transparent: location and budget are always active, w
 ## Features
 
 - Modern Home landing page
-- Original ML Price Predictor, loaded from `model selection/pipeline.pkl`
+- Original ML Price Predictor preserved in `Home/archive/Price_Predictor.py` and not exposed in the deployed site
 - Property Recommender with exact sector and budget constraints
 - Best Match, Lowest Price, Largest Area, Most Bedrooms, Best Budget Fit, and Closest Location sorting
 - Match percentages, budget utilization, score breakdown, comparisons, and property details
@@ -49,12 +49,13 @@ The score is intentionally transparent: location and budget are always active, w
 Home/
   Home.py
   pages/
-    Price_Predictor.py
     Property_Recommender.py
     Analysis_App.py
   utils/
     data_loader.py
     recommender.py
+  archive/
+    Price_Predictor.py
 assets/images/                 # local illustrative demo images
 model selection/               # original model, features, and model-selection notebook
 Cleaning/ Data/ EDA/ ...       # original project workflow and datasets
