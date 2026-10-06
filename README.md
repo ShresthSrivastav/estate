@@ -1,16 +1,12 @@
 # Nestwise — PBL Project Extended
 
-Nestwise is an extended version of the Gurgaon real-estate PBL project. It keeps the original cleaned datasets, notebooks, analytics, feature engineering work, and trained price-prediction pipeline, then adds an explainable property recommender and a presentation-ready Streamlit interface.
+Nestwise is an extended version of the Gurgaon real-estate PBL project. The deployed Streamlit app focuses on explainable property recommendations using the project's cleaned property data.
 
 ## Problem statement
 
 Property search is often a trade-off between a fixed location, a fixed budget, and many softer preferences. Nestwise first removes infeasible properties using hard constraints, then ranks the remaining real dataset records by preference fit.
 
-## Two different systems
-
-**Price prediction** uses the saved scikit-learn pipeline. Given property features, it estimates a market price in crores.
-
-**Recommendation** is constraint-based. Location and maximum budget are mandatory filters. Property type, bedrooms, bathrooms, area, furnishing, luxury, floor, balcony, servant room, and store room are optional ranking preferences. No relaxed result is mixed into the exact result list.
+The recommender is constraint-based. Location and maximum budget are mandatory filters. Property type, bedrooms, bathrooms, area, furnishing, luxury, floor, balcony, servant room, and store room are optional ranking preferences. No relaxed result is mixed into the exact result list.
 
 ```text
 User constraints
@@ -30,8 +26,7 @@ The score is intentionally transparent: location and budget are always active, w
 
 ## Features
 
-- Modern Home landing page
-- Original ML Price Predictor preserved in `Home/archive/Price_Predictor.py` and not exposed in the deployed site
+- Single-page Streamlit app that opens directly to the recommender
 - Property Recommender with exact sector and budget constraints
 - Best Match, Lowest Price, Largest Area, Most Bedrooms, Best Budget Fit, and Closest Location sorting
 - Match percentages, budget utilization, score breakdown, comparisons, and property details
@@ -39,8 +34,8 @@ The score is intentionally transparent: location and budget are always active, w
 - Session-only saved properties and explicitly labeled fallback budget flexibility
 - Local illustrative demo images in `assets/images/`
 - Clearly labelled demo location-search links instead of invented listing URLs
-- Existing Analytics page with map, word cloud, area/price, BHK, price distribution, and summary views
-- Cached data/model loading and portable `pathlib` paths
+- Archived predictor and analytics source retained outside Streamlit's `pages` directory
+- Cached data loading and portable `pathlib` paths
 - Explicit relaxed alternatives for no-result searches
 
 ## Project structure
@@ -50,12 +45,12 @@ Home/
   Home.py
   pages/
     Property_Recommender.py
-    Analysis_App.py
   utils/
     data_loader.py
     recommender.py
   archive/
     Price_Predictor.py
+    Analysis_App.py
 assets/images/                 # local illustrative demo images
 model selection/               # original model, features, and model-selection notebook
 Cleaning/ Data/ EDA/ ...       # original project workflow and datasets
